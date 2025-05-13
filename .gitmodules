@@ -1,0 +1,3 @@
+[submodule "vendor/ZFTurbo_MDX23"]
+	path = vendor/ZFTurbo_MDX23
+	url = git@github.com:ZFTurbo/MVSEP-MDX23-music-separation-model.git
