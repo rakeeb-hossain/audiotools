@@ -1,4 +1,7 @@
+import os
 import click
+from pathlib import Path
+
 
 @click.group
 def cli():
@@ -19,6 +22,17 @@ def glue(audio_paths, output_path):
 		raise click.UsageError("At least two audio files are required to glue.")
 	from audiotools.glue import glue_waveforms
 	glue_waveforms(audio_paths, output_path)
+
+@cli.command()
+@click.argument("audio_path", type=click.Path(exists=True))
+@click.argument("name", type=str)
+def train_svc(audio_path, name):
+	from audiotools.svc import train_svc_model
+	outpath = Path("output") / name
+	os.makedirs(outpath, exist_ok=True)
+
+	audio_path = Path(audio_path)
+	train_svc_model(audio_path, outpath)
 
 if __name__ == "__main__":
 	cli()
