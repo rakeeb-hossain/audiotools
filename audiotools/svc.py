@@ -3,12 +3,12 @@ import os
 from pathlib import Path
 import shutil
 
-from audiotools.utils import load_audio_and_resample
 from so_vits_svc_fork.preprocessing.preprocess_resample import preprocess_resample
 from so_vits_svc_fork.preprocessing.preprocess_split import preprocess_split
 from so_vits_svc_fork.preprocessing.preprocess_flist_config import preprocess_config
 from so_vits_svc_fork.preprocessing.preprocess_hubert_f0 import preprocess_hubert_f0
 from so_vits_svc_fork.train import train as train_so_vits
+from so_vits_svc_fork.inference.main import infer as infer_svc
 
 from rich.console import Console
 
@@ -46,7 +46,7 @@ def train_svc_model(
         c.print('Step 2: Splitting dataset...', style='bold yellow')
         split_dir = output_dir / 'split'
         os.makedirs(split_dir, exist_ok=True)
-        preprocess_split(dataset_dir, split_dir, 44100)
+        preprocess_split(dataset_dir, split_dir / output_dir.name, 44100)
 
         # Step 3: resample
         c.print('Step 3: Resampling dataset...', style='bold yellow')
@@ -75,3 +75,22 @@ def train_svc_model(
     model_dir = output_dir / 'model'
     os.makedirs(model_dir, exist_ok=True)
     train_so_vits(config_path, model_dir)
+
+
+def infer_svc_model(train_dir: Path, audio_path: Path, output_path: Path):
+    model_dir = train_dir / 'model'
+    model_path = list(
+        sorted(model_dir.glob("G_*.pth"), key=lambda x: x.stat().st_mtime)
+    )[-1]
+    config_path = train_dir / 'config' / 'config.json'
+
+    infer_svc(
+        input_path=audio_path,
+        output_path=output_path,
+        model_path=model_path,
+        config_path=config_path,
+        speaker=train_dir.name,
+        f0_method='crepe',
+    )
+
+    pass

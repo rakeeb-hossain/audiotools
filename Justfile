@@ -5,3 +5,6 @@ run *args:
 
 svc *args:
 	poetry run svc {{args}}
+
+tb *args:
+	poetry run tensorboard {{args}}

@@ -1,3 +1,4 @@
+from pathlib import Path
 import soundfile as sf
 from audiotools.utils import append_filename, load_audio_and_resample
 from vendor.ZFTurbo_MDX23.inference import EnsembleDemucsMDXMusicSeparationModel
@@ -31,7 +32,7 @@ class MDX23ProgressHandler:
         self.progress.stop()
 
 
-def split_stems_mdx23(audio_path):
+def split_stems_mdx23(audio_path: Path) -> tuple[Path, Path]:
     # Load the audio file
     audio, sr = load_audio_and_resample(audio_path)
     c.print(f"Loaded audio with shape: {audio.shape}, Sample rate: {sr}", style="bold yellow")
@@ -75,4 +76,6 @@ def split_stems_mdx23(audio_path):
     instrumental_path = append_filename(audio_path, '_instrumental')
     c.print(f"Saving instrumental to {instrumental_path}...", style="bold yellow")
     sf.write(instrumental_path, instrumental, sr)
+
+    return vocals_path, instrumental_path
     
